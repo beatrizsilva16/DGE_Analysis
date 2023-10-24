@@ -18,7 +18,6 @@ library(dplyr)
 
 ```{r}
 
-#addddd 
 setwd("C:/Users/USUARIO/Desktop/Ude_analysis/Gene_expression/DGE_Chronic_Experiments/DGE_Analysis")
 
 
