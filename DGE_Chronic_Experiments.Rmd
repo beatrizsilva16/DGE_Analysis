@@ -1,0 +1,759 @@
+---
+title: "DGE_Chronic_Experiments"
+author: "Beatriz Silva"
+date: "2023-10-23"
+output: html_documen_
+---
+
+
+Loading Libraries
+```{r}
+
+library(edgeR)
+library(limma)
+library(DESeq2)
+library(dplyr)
+library(tibble)
+```
+
+
+Data pre-processing
+```{r}
+
+#addddd 
+setwd("C:/Users/USUARIO/Desktop/Ude_analysis/Gene_expression")
+
+
+data_counts <- read.table("contagens_tab.txt", header = TRUE, sep = "\t", row.names = 1, check.names = FALSE)
+sample_info <- read.table("colData.txt", header = TRUE, sep = "\t", row.names = 1, check.names = FALSE)
+
+group <- factor(paste(sample_info$pop, sample_info$temperature, sep = "."))
+
+sample_info <- cbind(sample_info, group = group)
+
+
+# Create DGEList object
+
+y <- DGEList(counts = data_counts, group = group)
+
+# Calculate CPM
+
+cpm_count <- cpm(y)
+
+# Set thresholds
+
+cpm_Val <- 1   # CPM value threshold
+gThreshold <- 4   # At least number of samples threshold
+
+thresholds <- rowSums(cpm_count > cpm_Val) >= gThreshold
+
+y <- calcNormFactors(y, lib.size = T, method = "TMM")
+
+y_filter <- y[thresholds,]
+
+dim(y_filter)  # [1] 23202 29
+
+```
+
+
+Statiscal Analysis - EdgeR
+
+```{r}
+
+
+# Design matrix for glm approach
+
+design <- model.matrix(~0 + group)
+
+colnames(design) <- levels(group)
+
+yf <- estimateDisp(y_filter, design)
+
+fit <- glmFit(yf, design)
+
+################  Contrasts all conditions  ################
+
+contrasts <- makeContrasts(
+         S20_S25 = S.20-S.25,
+         S20_S30 = S.20-S.30,
+         S25_S30 = S.25-S.30,
+         N20_N25 = N.20-N.25,
+         N20_N30 = N.20-N.30,
+         N25_N30 = N.25-N.30,
+         N20_S20 = N.20-S.20,
+         N25_S25 = N.25-S.25,
+         N30_S30 = N.30-S.30,
+         levels = colnames(coef(fit))
+)
+
+################ Contrasts - South Population ################
+
+contrasts_south <- makeContrasts(
+  S20_S25 = S.20 - S.25,
+  S20_S30 = S.20 - S.30,
+  levels = design
+)
+
+################ Contrasts - North Population ################
+
+contrasts_north <- makeContrasts(
+  N20_N25 = N.20 - N.25,
+  N20_N30 = N.20 - N.30,
+  levels = design
+)
+
+```
+
+
+DGE list EdgeR - North 20 ºC vs South 20 ºC
+```{r}
+# thresholds North 20 vs South 20
+
+qlf_north_south_20 <- glmLRT(fit, contrast = contrasts[,"N20_S20"])
+FDR_north_south_20 <- topTags(qlf_north_south_20, n = Inf, adjust.method = "BH", sort.by = "none")
+FDR_north_south_df_20 <- data.frame(gene_id = rownames(FDR_north_south_20), FDR_north_south_20)
+filtered_rows_north_south_20 <- FDR_north_south_df_20[FDR_north_south_df_20$FDR < 0.05 & abs(FDR_north_south_df_20$logFC) > 1, ]
+DGEs_EdgeR_north_south_20 <- filtered_rows_north_south_20[, c("gene_id", "logFC", "FDR")]
+
+dim(DGEs_EdgeR_north_south_20) # [1] 583   6
+
+#write.table(filtered_rows_north_south_20, file = "DGEs_North_South_20_EdgeR.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+```
+
+
+
+DGE list EdgeR - North 25 ºC vs South 25 ºC
+```{r}
+
+# thresholds North 25 vs South 25
+
+qlf_north_south_25 <- glmLRT(fit, contrast = contrasts[,"N25_S25"])
+FDR_north_south_25 <- topTags(qlf_north_south_25, n = Inf, adjust.method = "BH", sort.by = "none")
+FDR_north_south_df_25 <- data.frame(gene_id = rownames(FDR_north_south_25), FDR_north_south_25)
+filtered_rows_north_south_25 <- FDR_north_south_df_25[FDR_north_south_df_25$FDR < 0.05 & abs(FDR_north_south_df_25$logFC) > 1, ]
+DGEs_EdgeR_north_south_25 <- filtered_rows_north_south_25[, c("gene_id", "logFC", "FDR")]
+
+dim(DGEs_EdgeR_north_south_25) # [1] 1527    6
+
+#write.table(filtered_rows_north_south_25, file = "DGEs_North_South_25_EdgeR.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+
+DGE list EdgeR - North 30 ºC vs South 30 ºC
+```{r}
+
+# thresholds North 30 vs South 30
+
+qlf_north_south_30 <- glmLRT(fit, contrast = contrasts[,"N30_S30"])
+FDR_north_south_30 <- topTags(qlf_north_south_30, n = Inf, adjust.method = "BH", sort.by = "none")
+FDR_north_south_df_30 <- data.frame(gene_id = rownames(FDR_north_south_30), FDR_north_south_30)
+filtered_rows_north_south_30 <- FDR_north_south_df_30[FDR_north_south_df_30$FDR < 0.05 & abs(FDR_north_south_df_30$logFC) > 1, ]
+DGEs_EdgeR_north_south_30 <- filtered_rows_north_south_30[, c("gene_id", "logFC", "FDR")]
+
+dim(DGEs_EdgeR_north_south_30) # [1] 2853    6
+
+#write.table(filtered_rows_north_south_30, file = "DGEs_North_South_30_EdgeR.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+
+
+DGE list EdgeR - North 20 ºC, 25ºC, 30ºC
+```{r}
+
+# Thresholds - South 20 vs 25 vs 30
+qlf_south <- glmLRT(fit, contrast = contrasts_south)
+FDR_south <- topTags(qlf_south, n = Inf, adjust.method = "BH", sort.by = "none")
+FDR_south_df <- data.frame(gene_id = rownames(FDR_south), FDR_south)
+filtered_rows_south <- FDR_south_df[FDR_south_df$FDR < 0.05 & abs(FDR_south_df$logFC.S20_S25) > 1 & abs(FDR_south_df$logFC.S20_S30) > 1, ]
+
+filtered_rows_south <- filtered_rows_south[, c("gene_id", "logFC.S20_S25", "logFC.S20_S30")]
+
+filtered_rows_south <- filtered_rows_south[, -1]
+
+# Create a data frame with the "gene_id" column containing the row names and the "South_20" column filled with zeros
+DGEs_EdgeR_north_20_25_30 <- data.frame(gene_id = rownames(filtered_rows_south), South_20 = 0, filtered_rows_south)
+
+head(DGEs_EdgeR_north_20_25_30)
+#dim(filtered_rows_south)  # [1] 534   4
+
+# Save filtered_rows_south with modified columns
+#write.table(filtered_rows_south, file = "DGEs_South_20_25_30_EdgeR.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+
+DGE list EdgeR - South 20 ºC, 25ºC, 30ºC
+```{r}
+
+# Thresholds - North 20 vs 25 vs 30
+qlf_north <- glmLRT(fit, contrast = contrasts_north)
+FDR_north <- topTags(qlf_north, n = Inf, adjust.method = "BH", sort.by = "none")
+FDR_north_df <- data.frame(gene_id = rownames(FDR_north), FDR_north)
+filtered_rows_north <- FDR_north_df[FDR_north_df$FDR < 0.05 & abs(FDR_north_df$logFC.N20_N25) > 1 & abs(FDR_north_df$logFC.N20_N30) > 1, ]
+
+filtered_rows_north <- filtered_rows_north[, c("gene_id", "logFC.N20_N25", "logFC.N20_N30")]
+
+filtered_rows_north <- filtered_rows_north[, -1]
+
+# Create a data frame with the "gene_id" column containing the row names and the "South_20" column filled with zeros
+DGEs_EdgeR_south_20_25_30 <- data.frame(gene_id = rownames(filtered_rows_north), North_20 = 0, filtered_rows_north)
+
+head(DGEs_EdgeR_south_20_25_30)
+#dim(filtered_rows_north) # [1] 75  4
+
+
+```
+
+DGE list EdgeR - North vs South 
+```{r}
+
+# Design matrix for glm approach
+
+design <- model.matrix(~sample_info$pop + sample_info$temperature)
+rownames(design) <- colnames(y_filter)
+yf <- estimateDisp(y_filter, design)
+fit <- glmFit(yf, design)
+
+glm <- glmLRT(fit, coef=2)
+
+FDR_chronic_all <- topTags(glm, n = Inf, adjust.method = "BH", sort.by = "none")
+FDR_chronic_all <- data.frame(gene_id = rownames(FDR_chronic_all), FDR_chronic_all)
+filtered_rows_chronic_all <- FDR_chronic_all[FDR_chronic_all$FDR < 0.05 & abs(FDR_chronic_all$logFC) > 1, ]
+DGEs_EdgeR_North_South <- filtered_rows_chronic_all[, c("gene_id", "logFC", "FDR")]
+
+dim(DGEs_EdgeR_North_South) #   [1] 2891    3
+
+```
+
+
+
+
+
+Statiscal Analysis - Limma
+```{r}
+
+# design matrix - Voom transformation
+
+design <- model.matrix(~0+group)
+
+colnames(design) <- levels(group)
+
+y <- voom(y_filter, design, normalize="quantile")
+
+
+# Fitting linear models in limma
+
+fit <- lmFit(y, design)
+
+
+################  Contrasts all  ################
+
+contrasts <- makeContrasts(
+         S20_S25 = S.20-S.25,
+         S20_S30 = S.20-S.30,
+         S25_S30 = S.25-S.30,
+         N20_N25 = N.20-N.25,
+         N20_N30 = N.20-N.30,
+         N25_N30 = N.25-N.30,
+         N20_S20 = N.20-S.20,
+         N25_S25 = N.25-S.25,
+         N30_S30 = N.30-S.30,
+         levels = colnames(coef(fit))
+)
+
+
+################  Contrasts  South Population  ################
+
+contrasts_south <- makeContrasts(
+          S20_S25 = S.20-S.25,
+          S20_S30 = S.20-S.30,
+          levels=design
+)
+
+
+################  Contrasts  North Population  ################
+
+contrasts_north <- makeContrasts(
+          N20_N25 = N.20-N.25,
+          N20_N30 = N.20-N.30,
+          levels=design
+)
+
+
+## Contrasts - South all
+
+tmp_south <- contrasts.fit(fit, contrasts_south)
+tmp_south_f <- eBayes(tmp_south)
+
+## Contrasts - North all
+
+tmp_north <- contrasts.fit(fit, contrasts_north)
+tmp_north_f <- eBayes(tmp_north)
+
+
+```
+
+
+DGE list Limma - North 20 ºC vs South 20 ºC
+```{r}
+
+# thresholds North 20 vs South 20
+
+tmp_North_South_20 <- contrasts.fit(fit, contrasts[,"N20_S20"])
+tmp_North_South_20_f <- eBayes(tmp_North_South_20)
+
+top.table_North_South_20 <- topTable(tmp_North_South_20_f, number=Inf, adjust="BH", sort.by="none")
+FDR_North_South_df_20 <- data.frame(gene_id = rownames(top.table_North_South_20), top.table_North_South_20)
+filtered_North_South_20 <- FDR_North_South_df_20[FDR_North_South_df_20$adj.P.Val < 0.05 & abs(FDR_North_South_df_20$logFC) > 1, ]
+DGEs_Limma_north_south_20 <- filtered_North_South_20[, c("gene_id", "logFC", "adj.P.Val")]
+
+dim(DGEs_Limma_north_south_20) # [1] 169    7
+
+#write.table(filtered_North_South_20, file = "DGEs_North_South_20_Limma.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+```
+
+
+DGE list Limma - North 25 ºC vs South 25 ºC
+```{r}
+
+
+# thresholds North 25 vs South 25
+
+tmp_North_South_25 <- contrasts.fit(fit, contrasts[,"N25_S25"])
+tmp_North_South_25_f <- eBayes(tmp_North_South_25)
+
+top.table_North_South_25 <- topTable(tmp_North_South_25_f, number=Inf, adjust="BH", sort.by="none")
+FDR_North_South_df_25 <- data.frame(gene_id = rownames(top.table_North_South_25), top.table_North_South_25)
+filtered_North_South_25 <- FDR_North_South_df_25[FDR_North_South_df_25$adj.P.Val < 0.05 & abs(FDR_North_South_df_25$logFC) > 1, ]
+DGEs_Limma_north_south_25 <- filtered_North_South_25[, c("gene_id", "logFC", "adj.P.Val")]
+
+dim(DGEs_Limma_north_south_25) # [1] 718    7
+
+#write.table(filtered_North_South_25, file = "DGEs_North_South_25_Limma.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+
+DGE list Limma - North 30 ºC vs South 30 ºC
+```{r}
+
+# thresholds North 30 vs South 30
+
+tmp_North_South_30 <- contrasts.fit(fit, contrasts[,"N30_S30"])
+tmp_North_South_30_f <- eBayes(tmp_North_South_30)
+
+top.table_North_South_30 <- topTable(tmp_North_South_30_f, number=Inf, adjust="BH", sort.by="none")
+FDR_North_South_df_30 <- data.frame(gene_id = rownames(top.table_North_South_30), top.table_North_South_30)
+filtered_North_South_30 <- FDR_North_South_df_30[FDR_North_South_df_30$adj.P.Val < 0.05 & abs(FDR_North_South_df_30$logFC) > 1, ]
+DGEs_Limma_north_south_30 <- filtered_North_South_30[, c("gene_id", "logFC", "adj.P.Val")]
+
+dim(DGEs_Limma_north_south_30) # [1]  2090    7
+
+#write.table(filtered_North_South_30, file = "DGEs_North_South_30_Limma.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+
+DGE list Limma - North 20 ºC, 25 ºC, 30 ºC
+```{r}
+
+# thresholds - north 20 vs 25 vs 30
+
+top.table_north <- topTable(tmp_north_f, number=Inf, adjust="BH", sort.by="none")
+
+FDR_north_df <- data.frame(rowname = rownames(top.table_north), top.table_north)
+
+# Filter the selected rows
+selected_rows <- top.table_north[top.table_north$adj.P.Val < 0.05 & abs(top.table_north$N20_N25) > 1 & abs(top.table_north$N20_N30) > 1, ]
+
+# Create a data frame with the desired columns, including "gene_id" and "North_20" with zeros
+DGEs_Limma_north_20_25_30 <- data.frame(gene_id = rownames(selected_rows), North_20 = 0, North_25 = selected_rows$N20_N25, North_30 = selected_rows$N20_N30, adj.P.Val = selected_rows$adj.P.Val)
+
+# Print the first few rows of filtered_rows_north
+head(DGEs_Limma_north_20_25_30)
+dim(DGEs_Limma_north_20_25_30)
+
+
+```
+
+
+DGE list Limma - South 20 ºC, 25 ºC, 30 ºC
+```{r}
+
+# thresholds - south 20 vs 25 vs 30
+
+top.table_south <- topTable(tmp_south_f, number=Inf, adjust="BH", sort.by="none")
+FDR_south_df <- data.frame(gene_id = rownames(top.table_south), top.table_south)
+# Filter the selected rows
+selected_rows <- top.table_south[top.table_south$adj.P.Val < 0.05 & abs(top.table_south$S20_S25) > 1 & abs(top.table_south$S20_S30) > 1, ]
+
+# Create a data frame with the desired columns, including "gene_id" and "North_20" with zeros
+DGEs_Limma_south_20_25_30 <- data.frame(gene_id = rownames(selected_rows), South_20 = 0, South_25 = selected_rows$S20_S25, South_30 = selected_rows$S20_S30, adj.P.Val = selected_rows$adj.P.Val)
+
+# Print the first few rows of filtered_rows_north
+head(DGEs_Limma_south_20_25_30)
+dim(DGEs_Limma_south_20_25_30)
+
+
+
+```
+
+DGE list Limma - North vs South
+```{r}
+
+# design matrix
+
+design <- model.matrix(~sample_info$pop + sample_info$temperature)
+rownames(design) <- colnames(y_filter)
+y <- voom(y_filter, design, normalize="quantile")
+
+# Fitting linear models in limma
+
+fit <- lmFit(y, design)
+
+tmp_all <- contrasts.fit(fit, coef=2)
+tmp_all_f <- eBayes(tmp_all)
+
+top.table_all <- topTable(tmp_all_f, number=Inf, adjust="BH", sort.by="none")
+FDR_all_df <- data.frame(gene_id = rownames(top.table_all), top.table_all)
+
+DGEs_Limma_North_South <- FDR_all_df[top.table_all$adj.P.Val < 0.05 & abs(top.table_all$logFC ) > 1, ]
+
+dim(DGEs_Limma_North_South)  #   [1] 3030    7
+
+
+
+```
+
+
+Statiscal Analysis - DESeq2
+```{r}
+
+# DESeq2 analysis
+
+dds <- DESeqDataSetFromMatrix(y_filter$counts, colData = sample_info, design = formula(~group))
+
+dds <- DESeq(dds, test="Wald")
+
+results_names <- resultsNames(dds)
+results_names   
+
+```
+
+DGE list DESeq2 - North 20 ºC vs South 20 ºC
+```{r}
+
+############ Contrasts - South vs North Population ############
+
+results_North_South_20 <- results(dds, contrast=c("group", "S.20", "N.20"))
+results_North_South_25 <- results(dds, contrast=c("group", "S.25", "N.25"))
+results_North_South_30 <- results(dds, contrast=c("group", "S.30", "N.30"))
+
+# North 20 vs South 20
+
+results_North_South_20 <- na.omit(results_North_South_20)
+filter_results_N_S_20 <- results_North_South_20[results_North_South_20$padj < 0.05  & abs(results_North_South_20$log2FoldChange) > 1 ,]
+
+filter_results_N_S_20 <- cbind(gene_id = rownames(filter_results_N_S_20), filter_results_N_S_20)
+DGEs_DESeq2_north_south_20 <- filter_results_N_S_20[, c("gene_id", "log2FoldChange", "padj")]
+
+dim(DGEs_DESeq2_north_south_20)   # [1] 1115   6
+
+#write.table(filter_results_N_S_20, file = "DGEs_North_South_20_DESeq2.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+
+```
+
+
+DGE list DESeq2 - North 25 ºC vs South 25 ºC
+```{r}
+
+results_North_South_25 <- na.omit(results_North_South_25)
+filter_results_N_S_25 <- results_North_South_25[results_North_South_25$padj < 0.05  & abs(results_North_South_25$log2FoldChange) > 1 ,]
+
+filter_results_N_S_25 <- cbind(gene_id = rownames(filter_results_N_S_25), filter_results_N_S_25)
+DGEs_DESeq2_north_south_25 <- filter_results_N_S_25[, c("gene_id", "log2FoldChange", "padj")]
+
+dim(DGEs_DESeq2_north_south_25)   # [1] 1912   3
+
+#write.table(filter_results_N_S_25, file = "DGEs_North_South_25_DESeq2.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+```
+
+
+DGE list DESeq2 - North 30 ºC vs South 30 ºC
+```{r}
+
+results_North_South_30 <- na.omit(results_North_South_30)
+filter_results_N_S_30 <- results_North_South_30[results_North_South_30$padj < 0.05  & abs(results_North_South_30$log2FoldChange) > 1 ,]
+
+filter_results_N_S_30 <- cbind(gene_id = rownames(filter_results_N_S_30), filter_results_N_S_30)
+DGEs_DESeq2_north_south_30 <- filter_results_N_S_30[, c("gene_id", "log2FoldChange", "padj")]
+
+dim(DGEs_DESeq2_north_south_30)   # [1] 3259   3
+#write.table(filter_results_N_S_30, file = "DGEs_North_South_30_DESeq2.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
+```
+
+
+DGE list DESeq2 - North 20 ºC, 25 ºC, 30 ºC
+```{r}
+
+############ Contrasts - North ############
+
+results_25_20 <- results(dds, contrast=c("group", "N.25", "N.20"))
+results_30_20 <- results(dds, contrast=c("group", "N.30", "N.20"))
+
+# extract log2FoldChange and gene ID from results_25_20
+log2FC_25 <- results_25_20$log2FoldChange
+padj_25 <- results_25_20$padj
+gene_id <- rownames(results_25_20)
+
+results_25 <- data.frame(gene_id, log2FC_25, padj_25)
+
+# extract log2FoldChange and gene ID from results_30_20
+
+log2FC_30 <- results_30_20$log2FoldChange
+padj_30 <- results_30_20$padj
+gene_id <- rownames(results_30_20)
+
+results_30 <- data.frame(gene_id, log2FC_30, padj_30)
+
+# merge the two data.frames based on the gene ID
+merged_results <- merge(results_25, results_30, by = "gene_id", all = TRUE)
+
+# rename columns
+colnames(merged_results)[2] <- "North_25"
+colnames(merged_results)[3] <- "padj_25"
+colnames(merged_results)[4] <- "North_30"
+colnames(merged_results)[5] <- "padj_30"
+
+
+# thresholds - logFC and padj
+
+filtered_results <- merged_results %>% 
+  filter(North_25 > 1, North_30 > 1, padj_25 < 0.05, padj_30 < 0.05)
+
+
+filtered_results <- filtered_results %>%
+     mutate(North_20 = 0)
+
+# reorder columns
+DGEs_DESeq2_north_20_25_30 <- filtered_results[, c("gene_id", "North_20", "North_25", "North_30")]
+
+#dim(filtered_results_north) # [1] 26  4
+head(DGEs_DESeq2_north_20_25_30)
+
+```
+
+
+DGE list DESeq2 - South 20 ºC, 25 ºC, 30 ºC
+```{r}
+
+############ Contrasts - South ############
+
+results_25_20 <- results(dds, contrast=c("group", "S.25", "S.20"))
+results_30_20 <- results(dds, contrast=c("group", "S.30", "S.20"))
+
+
+# extract log2FoldChange and gene ID from results_25_20
+
+
+log2FC_25 <- results_25_20$log2FoldChange
+padj_25 <- results_25_20$padj
+gene_id <- rownames(results_25_20)
+
+results_25 <- data.frame(gene_id, log2FoldChange_25 = log2FC_25, padj_25)
+
+# extract log2FoldChange and gene ID from results_30_20
+
+log2FC_30 <- results_30_20$log2FoldChange
+padj_30 <- results_30_20$padj
+
+results_30 <- data.frame(gene_id, log2FoldChange_30 = log2FC_30, padj_30)
+
+# merge the two data.frames based on the gene ID
+
+merged_results <- merge(results_25, results_30, by = "gene_id", all = TRUE)
+
+# rename columns
+
+colnames(merged_results)[2] <- "South_25"
+colnames(merged_results)[3] <- "padj_25"
+colnames(merged_results)[4] <- "South_30"
+colnames(merged_results)[5] <- "padj_30"
+
+# thresholds - logFC and padj
+filtered_results <- merged_results %>%
+    filter(South_25 > 1, South_30 > 1, padj_25 < 0.05, padj_30 < 0.05)
+
+# add 'North_20' column 
+filtered_results <- filtered_results %>%
+     mutate(South_20 = 0)
+
+# reorder columns
+ DGEs_DESeq2_south_20_25_30 <- filtered_results[, c("gene_id", "South_20", "South_25", "South_30")]
+ 
+#dim(filtered_results_south) # [1] 40  4
+
+head(DGEs_DESeq2_south_20_25_30)
+
+```
+
+DGE list DESeq2 - North vs South
+```{r}
+
+dds <- DESeqDataSetFromMatrix(y_filter$counts, colData = sample_info, design = formula(~pop + temperature))
+
+dds <- DESeq(dds, test="Wald")
+
+results_all <- results(dds, contrast=c("pop", "S", "N"))
+
+results_all <- na.omit(results_all)
+filter_results_all <- results_all[results_all$padj < 0.05  & abs(results_all$log2FoldChange) > 1 ,]
+
+dim(filter_results_all)   # [1]   3095    6
+
+
+```
+
+
+
+Overlap between the three methods - North 20 ºC vs South 20 ºC
+```{r}
+
+DESeq2 <- DGEs_DESeq2_north_south_20$gene_id
+EdgeR <- DGEs_EdgeR_north_south_20$gene_id
+Limma <- DGEs_Limma_north_south_20$gene_id
+
+common_rows <- DESeq2[DESeq2 %in% EdgeR & DESeq2 %in% Limma]
+
+common_rows_list <- unlist(common_rows)
+
+overlap_3_methods <- data.frame(gene_id = common_rows_list)
+
+dim(overlap_3_methods)
+
+limma_data <- DGEs_Limma_north_south_20[, c("logFC", "adj.P.Val")]
+
+limma_data$gene_id <- rownames(limma_data)
+
+North_South_overlap_20 <- merge(overlap_3_methods, limma_data, by = "gene_id", all.x = TRUE)
+
+head(North_South_overlap_20)
+
+```
+
+
+Overlap between the three methods - North 25 ºC vs South 25 ºC
+```{r}
+
+DESeq2 <- DGEs_DESeq2_north_south_25$gene_id
+EdgeR <- DGEs_EdgeR_north_south_25$gene_id
+Limma <- DGEs_Limma_north_south_25$gene_id
+
+common_rows <- DESeq2[DESeq2 %in% EdgeR & DESeq2 %in% Limma]
+
+common_rows_list <- unlist(common_rows)
+
+overlap_3_methods <- data.frame(gene_id = common_rows_list)
+
+dim(overlap_3_methods)
+
+limma_data <- DGEs_Limma_north_south_25[, c("logFC", "adj.P.Val")]
+
+limma_data$gene_id <- rownames(limma_data)
+
+North_South_overlap_25 <- merge(overlap_3_methods, limma_data, by = "gene_id", all.x = TRUE)
+
+head(North_South_overlap_25)
+
+```
+
+Overlap between the three methods - North 30 ºC vs South 30 ºC
+
+```{r}
+
+DESeq2 <- DGEs_DESeq2_north_south_30$gene_id
+EdgeR <- DGEs_EdgeR_north_south_30$gene_id
+Limma <- DGEs_Limma_north_south_30$gene_id
+
+common_rows <- DESeq2[DESeq2 %in% EdgeR & DESeq2 %in% Limma]
+
+common_rows_list <- unlist(common_rows)
+
+overlap_3_methods <- data.frame(gene_id = common_rows_list)
+
+dim(overlap_3_methods)
+
+limma_data <- DGEs_Limma_north_south_25[, c("logFC", "adj.P.Val")]
+
+limma_data$gene_id <- rownames(limma_data)
+
+North_South_overlap_30 <- merge(overlap_3_methods, limma_data, by = "gene_id", all.x = TRUE)
+
+head(North_South_overlap_30)
+
+```
+
+Overlap between the three methods - North 20 ºC, 25 ºC, 30ºC
+
+```{r}
+
+DESeq2 <- DGEs_DESeq2_north_20_25_30$gene_id
+EdgeR <- DGEs_EdgeR_north_20_25_30$gene_id
+Limma <- DGEs_Limma_north_20_25_30$gene_id
+
+common_rows <- DESeq2[DESeq2 %in% EdgeR & DESeq2 %in% Limma]
+
+common_rows_list <- unlist(common_rows)
+
+overlap_3_methods <- data.frame(gene_id = common_rows_list)
+
+dim(overlap_3_methods)
+
+limma_data <- DGEs_Limma_north_20_25_30[, c("North_20", "North_25", "North_30", "adj.P.Val")]
+
+limma_data$gene_id <- rownames(limma_data)
+
+North_20_25_30_overlap <- merge(overlap_3_methods, limma_data, by = "gene_id", all.x = TRUE)
+
+head(North_20_25_30_overlap)
+
+```
+
+Overlap between the three methods - South 20 ºC, 25 ºC, 30ºC
+
+```{r}
+
+DESeq2 <- DGEs_DESeq2_south_20_25_30$gene_id
+EdgeR <- DGEs_EdgeR_south_20_25_30$gene_id
+Limma <- DGEs_Limma_south_20_25_30$gene_id
+
+common_rows <- DESeq2[DESeq2 %in% EdgeR & DESeq2 %in% Limma]
+
+common_rows_list <- unlist(common_rows)
+
+overlap_3_methods <- data.frame(gene_id = common_rows_list)
+
+dim(overlap_3_methods)
+
+limma_data <- DGEs_Limma_south_20_25_30[, c("South_20", "South_25", "South_30", "adj.P.Val")]
+
+limma_data$gene_id <- rownames(limma_data)
+
+North_20_25_30_overlap <- merge(overlap_3_methods, limma_data, by = "gene_id", all.x = TRUE)
+
+head(North_20_25_30_overlap)
+
+```
+
