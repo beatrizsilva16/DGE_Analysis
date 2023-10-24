@@ -2,26 +2,24 @@
 title: "DGE_Chronic_Experiments"
 author: "Beatriz Silva"
 date: "2023-10-23"
-output: html_documen_
+output: html_document
 ---
 
 
-Loading Libraries
 ```{r}
 
 library(edgeR)
 library(limma)
 library(DESeq2)
 library(dplyr)
-library(tibble)
 ```
 
 
-Data pre-processing
+
 ```{r}
 
 #addddd 
-setwd("C:/Users/USUARIO/Desktop/Ude_analysis/Gene_expression")
+setwd("C:/Users/USUARIO/Desktop/Ude_analysis/Gene_expression/DGE_Chronic_Experiments/DGE_Analysis")
 
 
 data_counts <- read.table("contagens_tab.txt", header = TRUE, sep = "\t", row.names = 1, check.names = FALSE)
@@ -56,7 +54,7 @@ dim(y_filter)  # [1] 23202 29
 ```
 
 
-Statiscal Analysis - EdgeR
+
 
 ```{r}
 
@@ -105,7 +103,7 @@ contrasts_north <- makeContrasts(
 ```
 
 
-DGE list EdgeR - North 20 ºC vs South 20 ºC
+
 ```{r}
 # thresholds North 20 vs South 20
 
@@ -123,7 +121,7 @@ dim(DGEs_EdgeR_north_south_20) # [1] 583   6
 
 
 
-DGE list EdgeR - North 25 ºC vs South 25 ºC
+
 ```{r}
 
 # thresholds North 25 vs South 25
@@ -142,7 +140,6 @@ dim(DGEs_EdgeR_north_south_25) # [1] 1527    6
 ```
 
 
-DGE list EdgeR - North 30 ºC vs South 30 ºC
 ```{r}
 
 # thresholds North 30 vs South 30
@@ -162,7 +159,7 @@ dim(DGEs_EdgeR_north_south_30) # [1] 2853    6
 
 
 
-DGE list EdgeR - North 20 ºC, 25ºC, 30ºC
+
 ```{r}
 
 # Thresholds - South 20 vs 25 vs 30
@@ -188,7 +185,7 @@ head(DGEs_EdgeR_north_20_25_30)
 ```
 
 
-DGE list EdgeR - South 20 ºC, 25ºC, 30ºC
+
 ```{r}
 
 # Thresholds - North 20 vs 25 vs 30
@@ -210,7 +207,7 @@ head(DGEs_EdgeR_south_20_25_30)
 
 ```
 
-DGE list EdgeR - North vs South 
+
 ```{r}
 
 # Design matrix for glm approach
@@ -234,8 +231,6 @@ dim(DGEs_EdgeR_North_South) #   [1] 2891    3
 
 
 
-
-Statiscal Analysis - Limma
 ```{r}
 
 # design matrix - Voom transformation
@@ -300,7 +295,7 @@ tmp_north_f <- eBayes(tmp_north)
 ```
 
 
-DGE list Limma - North 20 ºC vs South 20 ºC
+
 ```{r}
 
 # thresholds North 20 vs South 20
@@ -320,7 +315,7 @@ dim(DGEs_Limma_north_south_20) # [1] 169    7
 ```
 
 
-DGE list Limma - North 25 ºC vs South 25 ºC
+
 ```{r}
 
 
@@ -342,7 +337,7 @@ dim(DGEs_Limma_north_south_25) # [1] 718    7
 ```
 
 
-DGE list Limma - North 30 ºC vs South 30 ºC
+
 ```{r}
 
 # thresholds North 30 vs South 30
@@ -363,7 +358,7 @@ dim(DGEs_Limma_north_south_30) # [1]  2090    7
 ```
 
 
-DGE list Limma - North 20 ºC, 25 ºC, 30 ºC
+
 ```{r}
 
 # thresholds - north 20 vs 25 vs 30
@@ -386,7 +381,7 @@ dim(DGEs_Limma_north_20_25_30)
 ```
 
 
-DGE list Limma - South 20 ºC, 25 ºC, 30 ºC
+
 ```{r}
 
 # thresholds - south 20 vs 25 vs 30
@@ -407,7 +402,8 @@ dim(DGEs_Limma_south_20_25_30)
 
 ```
 
-DGE list Limma - North vs South
+
+
 ```{r}
 
 # design matrix
@@ -435,7 +431,7 @@ dim(DGEs_Limma_North_South)  #   [1] 3030    7
 ```
 
 
-Statiscal Analysis - DESeq2
+
 ```{r}
 
 # DESeq2 analysis
@@ -449,7 +445,8 @@ results_names
 
 ```
 
-DGE list DESeq2 - North 20 ºC vs South 20 ºC
+
+
 ```{r}
 
 ############ Contrasts - South vs North Population ############
@@ -474,7 +471,7 @@ dim(DGEs_DESeq2_north_south_20)   # [1] 1115   6
 ```
 
 
-DGE list DESeq2 - North 25 ºC vs South 25 ºC
+
 ```{r}
 
 results_North_South_25 <- na.omit(results_North_South_25)
@@ -490,7 +487,7 @@ dim(DGEs_DESeq2_north_south_25)   # [1] 1912   3
 ```
 
 
-DGE list DESeq2 - North 30 ºC vs South 30 ºC
+
 ```{r}
 
 results_North_South_30 <- na.omit(results_North_South_30)
@@ -505,7 +502,7 @@ dim(DGEs_DESeq2_north_south_30)   # [1] 3259   3
 ```
 
 
-DGE list DESeq2 - North 20 ºC, 25 ºC, 30 ºC
+
 ```{r}
 
 ############ Contrasts - North ############
@@ -556,7 +553,7 @@ head(DGEs_DESeq2_north_20_25_30)
 ```
 
 
-DGE list DESeq2 - South 20 ºC, 25 ºC, 30 ºC
+
 ```{r}
 
 ############ Contrasts - South ############
@@ -609,7 +606,8 @@ head(DGEs_DESeq2_south_20_25_30)
 
 ```
 
-DGE list DESeq2 - North vs South
+
+
 ```{r}
 
 dds <- DESeqDataSetFromMatrix(y_filter$counts, colData = sample_info, design = formula(~pop + temperature))
@@ -628,7 +626,7 @@ dim(filter_results_all)   # [1]   3095    6
 
 
 
-Overlap between the three methods - North 20 ºC vs South 20 ºC
+
 ```{r}
 
 DESeq2 <- DGEs_DESeq2_north_south_20$gene_id
@@ -654,7 +652,7 @@ head(North_South_overlap_20)
 ```
 
 
-Overlap between the three methods - North 25 ºC vs South 25 ºC
+
 ```{r}
 
 DESeq2 <- DGEs_DESeq2_north_south_25$gene_id
@@ -679,7 +677,8 @@ head(North_South_overlap_25)
 
 ```
 
-Overlap between the three methods - North 30 ºC vs South 30 ºC
+
+
 
 ```{r}
 
@@ -705,7 +704,8 @@ head(North_South_overlap_30)
 
 ```
 
-Overlap between the three methods - North 20 ºC, 25 ºC, 30ºC
+
+
 
 ```{r}
 
@@ -731,7 +731,7 @@ head(North_20_25_30_overlap)
 
 ```
 
-Overlap between the three methods - South 20 ºC, 25 ºC, 30ºC
+
 
 ```{r}
 
