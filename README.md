@@ -1,9 +1,4 @@
-<table>
-  <tr>
-    <td style="border: none;"><img src="EEUMLOGO.png" alt="Imagem 1" width="100"></td>
-    <td style="border: none;"><img src="ciimar_logo_sem_fundo_pt.png" alt="Imagem 2" width="100"></td>
-  </tr>
-</table>
+![Imagem 1](EEUMLOGO.png) ![Imagem 2](ciimar_logo_sem_fundo_pt.png)
 
 
 ## Identify gene expression profiles in freshwater mussels under thermal stress
