@@ -1,3 +1,11 @@
+<table>
+  <tr>
+    <td><img src="EEUMLOGO.png" alt="Imagem 1"></td>
+    <td><img src="ciimar_logo_sem_fundo_pt.png" alt="Imagem 2"></td>
+  </tr>
+</table>
+
+
 ## Identify gene expression profiles in freshwater mussels under thermal stress
 
 This repository contains my master thesis which addresses code for DGE analysis using three methods, EdgeR, limma and DESeq2. This work is incorporated into to a project: EdgeOmics - Freshwater
