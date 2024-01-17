@@ -1,4 +1,4 @@
-<img src="EEUMLOGO.png" alt="Imagem 1" width="100"> <img src="ciimar_logo_sem_fundo_pt.png" alt="Imagem 2" width="100">
+<img src="EEUMLOGO.png" alt="Imagem 1" width="150"> <img src="ciimar_logo_sem_fundo_pt.png" alt="Imagem 2" width="150">
 
 
 ## Identify gene expression profiles in freshwater mussels under thermal stress
