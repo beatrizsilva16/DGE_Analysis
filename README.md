@@ -1,7 +1,7 @@
 <table>
   <tr>
-    <td><img src="EEUMLOGO.png" alt="Imagem 1" width="150"></td>
-    <td><img src="ciimar_logo_sem_fundo_pt.png" alt="Imagem 2" width="150"></td>
+    <td style="border: none;"><img src="EEUMLOGO.png" alt="Imagem 1" width="100"></td>
+    <td style="border: none;"><img src="ciimar_logo_sem_fundo_pt.png" alt="Imagem 2" width="100"></td>
   </tr>
 </table>
 
