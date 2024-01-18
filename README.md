@@ -12,5 +12,10 @@ Due to the fast progress of global climate change, the temperature of streams an
 
 ## Versions of the programs
 
-#### EdgeR - 
+- EdgeR - version 3.40.2
+
+- limma - version 3.54.2
+
+- DESeq2 - version 1.38.2
+
 
