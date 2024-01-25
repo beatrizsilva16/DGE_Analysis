@@ -27,8 +27,8 @@ differential gene expression profiles of these individuals under thermal stress.
 ology of this work differs from the past studies, by developing an R code compilation of three methods,
 EdgeR, limma, and DESeq2 for differential gene expression analysis in these organisms. The output of the
 present work provides a comprehensive overview of gene expression profile responses of
-*Unio delphinus* under climate change scenarios. Additionally, the results revealed a wide range of pathways and the corre-
-sponding genes that are impacted by thermal stress, with a particular emphasis on the up-regulation of the
+*U. delphinus* under climate change scenarios. Additionally, the results revealed a wide range of pathways 
+and the corresponding genes that are impacted by thermal stress, with a particular emphasis on the up-regulation of the
 genes ATP6V1A, ATP6V0A1, ATP6V0A, and ATP6V1. In the chronic experiments, and high temperatures,
 mussels expressed these genes and, interestingly, all the pathways that these genes included appeared
 up-regulated. The discovered genes and pathways provide vital insights into these organisms adaptation
