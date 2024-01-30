@@ -15,11 +15,9 @@ quality. Furthermore, they serve as essential ecosystem engineers, providing hab
 and supporting intricate food webs. Besides their biological importance, freshwater mussels are poorly
 studied in terms of genomics. In the present work, the Iberian dolphin freshwater mussel
 *Unio delphinus* Spengler, 1793 (Bivalvia: Unionoida) was used as a model species to investigate the effects of climate
-change in freshwater mussels. The primary objective of this thesis was to determine the gene expres-
-sion patterns in a model species of freshwater mussels under the effects of thermal stress exacerbated
+change in freshwater mussels. The primary objective of this thesis was to determine the gene expression patterns in a model species of freshwater mussels under the effects of thermal stress exacerbated
 by climate change, with an overall goal of understanding the larger consequences for freshwater mussel
-populations. Two different ecological experiments were performed: chronic and acute. The chronic ex-
-periments where temperatures were gradually increased to simulate a scenario of progressive increasing
+populations. Two different ecological experiments were performed: chronic and acute. The chronic experiments where temperatures were gradually increased to simulate a scenario of progressive increasing
 temperatures. The acute experiments where temperatures were rapidly increased to replicate the effects
 of a briefer extreme climatic event. To achieve this main goal, a comprehensive bioinformatic pipeline
 focused on transcriptomics analysis was developed using the R Bioconductor package to generate the
