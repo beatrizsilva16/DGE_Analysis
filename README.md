@@ -31,7 +31,6 @@ mussels expressed these genes and, interestingly, all the pathways that these ge
 up-regulated. The discovered genes and pathways provide vital insights into these organisms adaptation
 tactics and identify prospective targets for monitoring and conservation efforts.
 
-
 ## Versions of the programs
 
 - EdgeR - version 3.40.2
