@@ -3,7 +3,7 @@
 
 ## Identify gene expression profiles in freshwater mussels under thermal stress
 
-This repository contains part of my master thesis which addresses code for DGE analysis using three methods, EdgeR, limma and DESeq2. This work is incorporated into to a project: EdgeOmics - Freshwater
+This repository contains part of my master thesis which addresses code for Differential Gene Expression (DGE) analysis using three methods, EdgeR, limma and DESeq2. This work is incorporated into to a project: EdgeOmics - Freshwater
 Bivalves at the edge: Adaptation genomics under climate-change scenarios (http://doi.org/10.54499/PTDC/CTA-AMB/3065/2020). The present work was developed from my collaborative MSc thesis conducted between the School of Engineering at the University of Minho and Ciimar (Interdisciplinary Centre of Marine and Environmental Research of the University of Porto).
 
 ## Thesis Abstract
