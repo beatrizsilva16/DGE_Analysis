@@ -23,8 +23,7 @@ periments where temperatures were gradually increased to simulate a scenario of 
 temperatures. The acute experiments where temperatures were rapidly increased to replicate the effects
 of a briefer extreme climatic event. To achieve this main goal, a comprehensive bioinformatic pipeline
 focused on transcriptomics analysis was developed using the R Bioconductor package to generate the
-differential gene expression profiles of these individuals under thermal stress. The bioinformatic method-
-ology of this work differs from the past studies, by developing an R code compilation of three methods,
+differential gene expression profiles of these individuals under thermal stress. The bioinformatic methodology of this work differs from the past studies, by developing an R code compilation of three methods,
 EdgeR, limma, and DESeq2 for differential gene expression analysis in these organisms. The output of the
 present work provides a comprehensive overview of gene expression profile responses of
 *U. delphinus* under climate change scenarios. Additionally, the results revealed a wide range of pathways 
